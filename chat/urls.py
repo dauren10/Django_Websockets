@@ -4,7 +4,6 @@ from . import views
 
 
 urlpatterns = [
-    path("chats",views.ChatListCreateAPIView.as_view()),
     path("", views.index, name="index"),
     path("<str:room_name>/", views.room, name="room"),
 ]
