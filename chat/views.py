@@ -4,11 +4,11 @@ from rest_framework import filters
 from rest_framework import decorators, filters, request, viewsets
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Chat
+from .models import Message
 from .serializers import ChatSerializer
 
 class ChatViewSet(viewsets.ModelViewSet):
-    queryset = Chat.objects.all()
+    queryset = Message.objects.all()
     serializer_class = ChatSerializer
 
     search_fields = ["id"]

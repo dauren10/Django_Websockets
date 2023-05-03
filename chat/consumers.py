@@ -3,6 +3,10 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth.models import AnonymousUser
 import logging
+from .models import Message
+from django.contrib.auth.models import User
+from django.db import transaction
+from channels.db import database_sync_to_async
 logger = logging.getLogger(__name__)
 '''
 метод receive используется для обработки входящих сообщений от клиентов, 
@@ -46,15 +50,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
-        print(message)
+        
+
+
+        message_obj = await self.create_chat(message, self.user)
         # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name, {"type": "chat_message", "message": message}
         )
-
+    @database_sync_to_async
+    def create_chat(self, message, sender):
+        return Message.objects.create(user=User(1),recipient=User(2), text=message)
+    
     # Receive message from room group
     async def chat_message(self, event):
         message = event["message"]
-        
+      
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({"message": message}))
+        await self.send(text_data=json.dumps({"message": message,"user":1}))
