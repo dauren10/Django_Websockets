@@ -50,21 +50,27 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
+        try:
+            recipient = text_data_json["recipient"]
+        except:
+            recipient = 2
         
 
 
-        message_obj = await self.create_chat(message, self.user)
+        message_obj = await self.create_chat(message, self.user,recipient)
         # Send message to room group
         await self.channel_layer.group_send(
-            self.room_group_name, {"type": "chat_message", "message": message}
+            self.room_group_name, {"type": "chat_message", "message": message, "user":self.user.id}
         )
     @database_sync_to_async
-    def create_chat(self, message, sender):
-        return Message.objects.create(user=User(1),recipient=User(2), text=message)
+    def create_chat(self, message, sender,recipient):
+        print(sender.id)
+        return Message.objects.create(user=User(sender.id),recipient=User(recipient), message=message)
     
     # Receive message from room group
+    #то что улетает,  а данные приходят с await self.channel_layer.group_send
     async def chat_message(self, event):
         message = event["message"]
-      
+        user = event["user"]
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({"message": message,"user":1}))
+        await self.send(text_data=json.dumps({"message": message,"user":user}))

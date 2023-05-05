@@ -23,7 +23,7 @@ from chat.views import ChatViewSet
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['url', 'username', 'email', 'is_staff']
+        fields = ['id','url', 'username', 'email', 'is_staff']
 
 # ViewSets define the view behavior.
 class UserViewSet(viewsets.ModelViewSet):
